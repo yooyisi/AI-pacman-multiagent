@@ -87,6 +87,38 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    #print "Start:", problem.getStartState()
+    #print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+    #print "Start's successors:", problem.getSuccessors(problem.getStartState())
+
+    nodes_to_expand = util.Stack()
+    ss_node = [problem.getStartState()]   # location and path to it
+    set_of_expanded_node = set(ss_node)
+
+    if problem.isGoalState(problem.getStartState()):
+        return []
+    else:
+        nodes_to_expand.push((problem.getStartState(), []))
+
+    while not nodes_to_expand.isEmpty():
+        fullstate = nodes_to_expand.pop()
+        state = fullstate[0]
+        set_of_expanded_node.add(state)
+        successors = problem.getSuccessors(state)
+        for item in successors:     # item: ((1,1),west,1)
+            # check for each successor: if it is the goal
+            if problem.isGoalState(item[0]):
+                path = fullstate[1]
+                path.append(item[1])
+                return path
+            else:
+                # check if it is already expanded
+                if item[0] not in set_of_expanded_node:
+                    # add path info this node
+                    location = item[0]
+                    path = fullstate[1][:]
+                    path.append(item[1])    # same like c++? also add to fullstate?
+                    nodes_to_expand.push((location, path))
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
