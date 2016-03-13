@@ -141,6 +141,27 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    fringe = util.PriorityQueue()        # stack to store nodes and path to it
+    ss_node = [problem.getStartState()]   # location of the node
+    set_of_expanded_node = set(ss_node)   # set of expanded nodes
+
+    if problem.isGoalState(problem.getStartState()):
+        return []
+    else:
+        fringe.push((problem.getStartState(),[]),0)
+
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
+        set_of_expanded_node.add(state)
+        successors = problem.getSuccessors(state)
+        for location, direction, cost in successors:     # item: ((1,1),west,1)
+            # check for each successor: if it is the goal
+            if problem.isGoalState(location):
+                return actions + [direction]
+            else:
+                # check if it is already expanded
+                if location not in set_of_expanded_node:
+                    fringe.push((location, actions + [direction]),cost)
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
