@@ -381,15 +381,21 @@ def cornersHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     location = state[0]
     goal_info = state[1]
+    x = location[0]
+    y = location[1]
+    # check if it is 3 walls surounded
+    #if walls[x-1][y]
     goals_to_go = 0
     index = 0
     distance = 0
+    c1 = 0
+    c2 = 0
     for goal in goal_info:
         goals_to_go += goal
         if goal == 0:
             distance += abs(location[0]-corners[index][0])+abs(location[1]-corners[index][1])
         index+=1
-    return distance
+    return goals_to_go*999+distance
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):

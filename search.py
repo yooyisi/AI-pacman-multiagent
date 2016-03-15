@@ -90,34 +90,6 @@ def depthFirstSearch(problem):
 
     fringe = util.Stack()        # stack to store nodes and path to it
     ss_node = [problem.getStartState()]   # location of the node
-    set_of_expanded_node = set(ss_node)   # set of expanded nodes
-
-    if problem.isGoalState(problem.getStartState()):
-        return []
-    else:
-        fringe.push((problem.getStartState(),[]))
-
-    while not fringe.isEmpty():
-        state, actions = fringe.pop()
-        if state not in set_of_expanded_node:
-            set_of_expanded_node.add(state)
-            successors = problem.getSuccessors(state)
-
-            for location, direction, cost in successors:     # item: ((1,1),west,1)
-
-                # check for each successor: if it is the goal
-                if problem.isGoalState(location):
-                    return actions + [direction]
-                else:
-                    # check if it is already expanded
-                    if location not in set_of_expanded_node:
-                        fringe.push((location, actions + [direction]))
-
-def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    fringe = util.Queue()        # stack to store nodes and path to it
-    ss_node = [problem.getStartState()]   # location of the node
     set_of_expanded_node = []   # set of expanded nodes
 
     if problem.isGoalState(problem.getStartState()):
@@ -127,44 +99,62 @@ def breadthFirstSearch(problem):
 
     while not fringe.isEmpty():
         state, actions = fringe.pop()
+        if problem.isGoalState(state):
+            return actions
         if state not in set_of_expanded_node:
             set_of_expanded_node.append(state)
             successors = problem.getSuccessors(state)
-
-            for nextState, direction, cost in successors:     # item: ((1,1),west,1)
-                # check for each successor: if it is the goal
-                if problem.isGoalState(nextState):
-                    return actions + [direction]
-                else:
+            for location, direction, cost in successors:     # item: ((1,1),west,1)
                     # check if it is already expanded
-                    if nextState not in set_of_expanded_node:
-                        fringe.push((nextState, actions + [direction]))
+                if location not in set_of_expanded_node:
+                    fringe.push((location, actions + [direction]))
+
+def breadthFirstSearch(problem):
+    """Search the shallowest nodes in the search tree first."""
+    "*** YOUR CODE HERE ***"
+    fringe = util.Queue()        # stack to store nodes and path to it
+    set_of_expanded_node = []   # set of expanded nodes
+
+    if problem.isGoalState(problem.getStartState()):
+        return []
+    else:
+        fringe.push((problem.getStartState(),[]))
+
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
+        if problem.isGoalState(state):
+            return actions
+        if state not in set_of_expanded_node:
+            set_of_expanded_node.append(state)
+            successors = problem.getSuccessors(state)
+            for location, direction, cost in successors:     # item: ((1,1),west,1)
+                # check if it is already expanded
+                if location not in set_of_expanded_node:
+                    fringe.push((location, actions + [direction]))
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     fringe = util.PriorityQueue()        # stack to store nodes and path to it
-    ss_node = [problem.getStartState()]   # location of the node
-    set_of_expanded_node = set(ss_node)   # set of expanded nodes
+    set_of_expanded_node = []   # set of expanded nodes
 
     if problem.isGoalState(problem.getStartState()):
         return []
     else:
-        fringe.push((problem.getStartState(),[]),0)
+        fringe.push((problem.getStartState(),[],0),0)
 
     while not fringe.isEmpty():
-        state, actions = fringe.pop()
+        state, actions, path_cost = fringe.pop()
+        if problem.isGoalState(state):
+            return actions
         if state not in set_of_expanded_node:
-            set_of_expanded_node.add(state)
+            set_of_expanded_node.append(state)
             successors = problem.getSuccessors(state)
             for location, direction, cost in successors:     # item: ((1,1),west,1)
-                # check for each successor: if it is the goal
-                if problem.isGoalState(location):
-                    return actions + [direction]
-                else:
-                    # check if it is already expanded
-                    if location not in set_of_expanded_node:
-                        fringe.push((location, actions + [direction]),cost)
+
+                if location not in set_of_expanded_node:
+                    fringe.push((location, actions + [direction],path_cost+cost),path_cost+cost)
 
 def nullHeuristic(state, problem=None):
     """
@@ -177,28 +167,24 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     fringe = util.PriorityQueue()        # stack to store nodes and path to it
-    ss_node = [problem.getStartState()]   # location of the node
     set_of_expanded_node = []   # set of expanded nodes
 
     if problem.isGoalState(problem.getStartState()):
         return []
     else:
-        fringe.push((problem.getStartState(),[]),heuristic(problem.getStartState(),problem))
-        print heuristic(problem.getStartState(),problem)
+        fringe.push((problem.getStartState(),[],0),0+heuristic(problem.getStartState(),problem))
 
     while not fringe.isEmpty():
-        state, actions = fringe.pop()
+        state, actions, path_cost = fringe.pop()
+        if problem.isGoalState(state):
+            return actions
         if state not in set_of_expanded_node:
             set_of_expanded_node.append(state)
             successors = problem.getSuccessors(state)
             for location, direction, cost in successors:     # item: ((1,1),west,1)
-                # check for each successor: if it is the goal
-                if problem.isGoalState(location):
-                    return actions + [direction]
-                else:
-                    # check if it is already expanded
-                    if location not in set_of_expanded_node:
-                        fringe.push((location, actions + [direction]),heuristic(state,problem))
+                # check if it is already expanded
+                if location not in set_of_expanded_node:
+                    fringe.push((location, actions + [direction], path_cost+cost),path_cost+cost+heuristic(location,problem))
 
 
 # Abbreviations
