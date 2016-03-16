@@ -407,7 +407,7 @@ def find_closest_corner(current_position, corners):
 
 
 def manhattan_distance_two_nodes(node1, node2):
-    return abs(node1[0]+node1[1]-node2[0]-node2[1])
+    return abs(node1[0]-node2[0])+abs(node1[1]-node2[1])
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -501,7 +501,35 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    #print state
+    #print foodGrid
+    foods = find_food_locations(foodGrid)[:]
+    current_location = state[0]
+    goals_to_go = state[1]
+    ret = 0
+    #print foodGrid
+    #print state
+    while len(foods)!=0:
+        closest_corner_index = find_closest_corner(current_location, foods)
+        ret += manhattan_distance_two_nodes(foods[closest_corner_index], current_location)
+        current_location = foods[closest_corner_index]
+        foods.remove(current_location)
+    #print str()+" has h value of " + str(ret)
+    return ret
+
+def find_food_locations(food_grid):
+    foods = []  # store the locations in this list
+
+    # i to determine x index
+    i = 0
+    for nodes in food_grid:
+        i += 1
+        j = 0
+        for node in nodes:
+            j += 1
+            if node:
+                foods.append((i,j))
+    return foods
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -568,6 +596,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
+        return
         util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
