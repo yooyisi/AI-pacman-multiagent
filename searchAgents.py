@@ -288,6 +288,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.unvisited_corners = self.corners[:]
 
     def getStartState(self):
         """
@@ -296,15 +297,13 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         return (self.startingPosition, [0,0,0,0])
-        util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        return state[1] == [1,1,1,1]
-        util.raiseNotDefined()
+        return state[1] == [1, 1, 1, 1]
 
     def getSuccessors(self, state):
         """
@@ -379,24 +378,36 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    location = state[0]
-    goal_info = state[1]
-    x = location[0]
-    y = location[1]
-    # check if it is 3 walls surounded
-    #if walls[x-1][y]
-    goals_to_go = 0
-    index = 0
-    distance = 0
-    c1 = 0
-    c2 = 0
-    for goal in goal_info:
-        goals_to_go += goal
-        if goal == 0:
-            distance += abs(location[0]-corners[index][0])+abs(location[1]-corners[index][1])
-        index+=1
-    return goals_to_go*999+distance
-    return 0 # Default to trivial solution
+    current_location = state[0]
+    goals_to_go = state[1]
+    unvisited_corners = []
+    ret = 0
+
+    for index in range(0,4):
+        if not goals_to_go[index]:
+            unvisited_corners.append(corners[index])
+
+    while len(unvisited_corners)!=0:
+        closest_corner_index = find_closest_corner(current_location, unvisited_corners)
+        ret += manhattan_distance_two_nodes(unvisited_corners[closest_corner_index], current_location)
+        current_location = unvisited_corners[closest_corner_index]
+        unvisited_corners.remove(current_location)
+    return ret
+
+
+def find_closest_corner(current_position, corners):
+    index = -1
+    min_ds = 999999
+    for corner in corners:
+        md = manhattan_distance_two_nodes(current_position, corner)
+        if md < min_ds:
+            index = corners.index(corner)
+            min_ds = md
+    return index
+
+
+def manhattan_distance_two_nodes(node1, node2):
+    return abs(node1[0]+node1[1]-node2[0]-node2[1])
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
