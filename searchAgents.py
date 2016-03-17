@@ -560,7 +560,35 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # found closest dot
+        goal = find_closest_dot(gameState)
+        food_problem = AnyFoodSearchProblem(gameState)
+        return search.breadthFirstSearch(food_problem)
+
+
+def find_closest_dot(gameState):
+    index_x = -1
+    index_y = -1
+    min_distance = 9999999
+    row = -1
+
+    food = gameState.getFood()
+    startPosition = gameState.getPacmanPosition()
+    for dot_row in food:
+        row += 1
+        colume = -1
+        for dot in dot_row:
+            colume += 1
+            if food[row][colume]:
+                #current_distance = mazeDistance((row, colume), startPosition, gameState)   --slow
+                current_distance = manhattan_distance_two_nodes((row, colume), startPosition)   # ---fast
+                if min_distance > current_distance:
+                    min_distance = current_distance
+                    index_x = row
+                    index_y = colume
+    return (index_x, index_y)
+
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -596,8 +624,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        return
-        util.raiseNotDefined()
+        return self.food[x][y]
 
 def mazeDistance(point1, point2, gameState):
     """
