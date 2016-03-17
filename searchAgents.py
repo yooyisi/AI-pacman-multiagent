@@ -465,6 +465,7 @@ class FoodSearchProblem:
             cost += 1
         return cost
 
+
 class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
@@ -507,29 +508,52 @@ def foodHeuristic(state, problem):
     current_location = state[0]
     goals_to_go = state[1]
     ret = 0
-    #print foodGrid
-    #print state
-    while len(foods)!=0:
-        closest_corner_index = find_closest_corner(current_location, foods)
-        ret += manhattan_distance_two_nodes(foods[closest_corner_index], current_location)
-        current_location = foods[closest_corner_index]
-        foods.remove(current_location)
-    #print str()+" has h value of " + str(ret)
-    return ret
+
+    if len(foods)==0: return 0
+
+    tree = []
+    tree += [current_location]
+    val = krim_spanning_tree(tree, foods)
+    #print str(current_location)+"'s h is "+str(val)
+    return val
+
+
+def krim_spanning_tree(spanning_tree, other_nodes):
+    if len(other_nodes)==0:
+        return 0
+
+    minimal_distance = 999999
+    found_node_index = -1
+    for leave in spanning_tree:
+        i = -1
+        for node in other_nodes:
+            i += 1
+            md = manhattan_distance_two_nodes(leave, node)
+            if md < minimal_distance:
+                minmal_distance = md
+                found_node_index = i
+    # print found_node_index
+    spanning_tree = spanning_tree +[other_nodes[found_node_index]]
+    other_nodes.remove(other_nodes[found_node_index])
+    # print "tree " + str(spanning_tree)
+    # print "nodes "+str(other_nodes)
+    return krim_spanning_tree(spanning_tree, other_nodes) + minimal_distance
+
 
 def find_food_locations(food_grid):
     foods = []  # store the locations in this list
 
     # i to determine x index
-    i = 0
+    i = -1
     for nodes in food_grid:
         i += 1
-        j = 0
+        j = -1
         for node in nodes:
             j += 1
             if node:
                 foods.append((i,j))
     return foods
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
