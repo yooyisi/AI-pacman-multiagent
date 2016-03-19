@@ -86,7 +86,6 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
 
     fringe = util.Stack()        # stack to store nodes and path to it
     ss_node = [problem.getStartState()]   # location of the node
@@ -111,7 +110,7 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
+
     fringe = util.Queue()        # stack to store nodes and path to it
     set_of_expanded_node = []   # set of expanded nodes
 
@@ -135,7 +134,7 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
+
     fringe = util.PriorityQueue()        # stack to store nodes and path to it
     set_of_expanded_node = []   # set of expanded nodes
 
@@ -165,7 +164,7 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
+
     fringe = util.PriorityQueue()        # stack to store nodes and path to it
     set_of_expanded_node = []   # set of expanded nodes
 

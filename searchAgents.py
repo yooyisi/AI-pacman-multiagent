@@ -377,7 +377,6 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
     current_location = state[0]
     goals_to_go = state[1]
     unvisited_corners = []
@@ -501,20 +500,49 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    #print state
-    #print foodGrid
     foods = find_food_locations(foodGrid)[:]
     current_location = state[0]
     goals_to_go = state[1]
     ret = 0
+    extreme_distance = 0
+    i = 0
+    while len(foods)!=0:
+        closest_corner_index = find_closest_corner(current_location, foods)
+        distance = manhattan_distance_two_nodes(foods[closest_corner_index], current_location)
+        ret += distance
+        current_location = foods[closest_corner_index]
+        foods.remove(current_location)
+        if extreme_distance == 0 or extreme_distance < distance:
+            extreme_distance = distance
+        i += 1
 
-    if len(foods)==0: return 0
+    if i > 1:
+        c = 0.5
+        return ret-(extreme_distance*c)
+    return ret
 
+def find_food_locations(food_grid):
+    foods = []  # store the locations in this list
+
+    # i to determine x index
+    i = 0
+    for nodes in food_grid:
+        i += 1
+        j = 0
+        for node in nodes:
+            j += 1
+            if node:
+                foods.append((i,j))
+    return foods
+
+
+# solution sonning tree is not consistant
+def solution_spnning_tree(state):
+    current_location, foodGrid = state
+    foods = find_food_locations(foodGrid)[:]
     tree = []
     tree += [current_location]
     val = krim_spanning_tree(tree, foods)
-    #print str(current_location)+"'s h is "+str(val)
     return val
 
 
@@ -530,13 +558,9 @@ def krim_spanning_tree(spanning_tree, other_nodes):
             i += 1
             md = manhattan_distance_two_nodes(leave, node)
             if md < minimal_distance:
-                minmal_distance = md
                 found_node_index = i
-    # print found_node_index
     spanning_tree = spanning_tree +[other_nodes[found_node_index]]
     other_nodes.remove(other_nodes[found_node_index])
-    # print "tree " + str(spanning_tree)
-    # print "nodes "+str(other_nodes)
     return krim_spanning_tree(spanning_tree, other_nodes) + minimal_distance
 
 
@@ -582,8 +606,6 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-
-        "*** YOUR CODE HERE ***"
 
         # found closest dot
         goal = find_closest_dot(gameState)
@@ -646,8 +668,6 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
-
-        "*** YOUR CODE HERE ***"
         return self.food[x][y]
 
 def mazeDistance(point1, point2, gameState):
