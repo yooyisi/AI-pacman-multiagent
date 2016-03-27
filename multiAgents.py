@@ -74,6 +74,7 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
+        #util.raiseNotDefined()
         #print "ghost state: " + str(newGhostStates)
         #print newFood
         #print newPos
@@ -97,6 +98,7 @@ class ReflexAgent(Agent):
             if distance_2nd_closest_ghost==distance_closest_ghost==1:
                 return -2
         """
+        # the bigger the better
         if distance_closest_ghost==0:
             return -9999
         if distance_closest_ghost==1:
@@ -157,8 +159,35 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        num_agent = gameState.getNumAgents()
+        depth = self.depth
+        num_steps = depth*num_agent#(depth+1)%2 + (depth+1)*num_agent/2
+        actions = gameState.getLegalActions(0)
+        best_choice = self.minimax_function(depth, 1, num_agent, gameState, num_steps)
+        return actions[best_choice]
+
+    # current_depth starts from 1 ends at depth
+    def minimax_function(self, depth, current_step, num_agent, gameState, num_steps):
+        if current_step>num_steps or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+
+        agent_index = current_step % num_agent - 1
+        legal_moves = gameState.getLegalActions(agent_index)
+        values = [self.minimax_function(depth, current_step + 1, num_agent, gameState.generateSuccessor(agent_index, a), num_steps) for a in legal_moves]
+
+        if (current_step -1)%num_agent == 0:
+            values += [-float("inf")]
+            max_value = max(values)
+            # for 1st, return the action
+            if current_step == 1:
+                best_indices = [index for index in range(len(values)-1) if values[index] == max_value]
+                return random.choice(best_indices) # Pick randomly among the best
+            # for others, return the max value
+            return max_value
+        else:
+            values += [float("inf")]
+            return min(values)
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
