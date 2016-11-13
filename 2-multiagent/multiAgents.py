@@ -305,16 +305,9 @@ def betterEvaluationFunction(currentGameState):
         else:
             md += 1/util.manhattanDistance(currentGameState.getPacmanPosition(), ghostPosition)
 
-    food = 0
-    numFood = currentGameState.getNumFood()
-    if numFood == 0:
-        food = 9999
-    else:
-        food = 1/numFood
-
     score = currentGameState.getScore()
 
-    v = md*20 + score/10 + food*5
+    v = md*50 + score/10
     return v
 
 
