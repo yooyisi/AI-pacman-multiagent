@@ -199,7 +199,49 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        num_agent = gameState.getNumAgents()
+        depth = self.depth
+        num_steps = depth * num_agent - 1  # start from 0
+        actions = gameState.getLegalActions(0)
+        best_choice = self.pruning_function(depth, 0, num_agent, gameState, num_steps, -float("inf"), float("inf") )
+        return actions[best_choice]
+
+    # current_depth starts from 1 ends at depth
+    def pruning_function(self, depth, current_step, num_agent, gameState, num_steps, alpha, beta):
+        if current_step>num_steps or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+
+        agent_index = current_step % num_agent
+        isPacman = agent_index == 0
+        legal_moves = gameState.getLegalActions(agent_index)
+
+        # initialize v
+        if not isPacman:
+            v = float("inf")
+        if isPacman:
+            v = -float("inf")
+
+        # for each node, check alpha-beta condition and expand the node
+        values = [v]
+        for a in legal_moves:
+            if isPacman and (v>beta):
+                break
+            if (not isPacman) and (v<alpha):
+                break
+            values += [self.pruning_function(depth,current_step+1, num_agent, gameState.generateSuccessor(agent_index, a), num_steps, alpha, beta)]
+            # update v , alpha and beta
+            if isPacman:
+                v = max(values)
+                alpha = max(v,alpha)
+            if not isPacman:
+                v = min(values)
+                beta = min(v, beta)
+
+        if current_step == 0:
+            best_indices = [index - 1 for index in range(len(values)) if values[index] == v]
+            return random.choice(best_indices)  # Pick randomly among the best
+
+        return v
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
