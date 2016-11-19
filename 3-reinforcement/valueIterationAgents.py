@@ -46,10 +46,20 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
         for iteration in range(0, iterations):
+            temps = util.Counter()
             for state in mdp.getStates():
                 if mdp.isTerminal(state):
                     continue
-                self.values[state] = self.computeQValueFromValues(state, self.computeActionFromValues(state))
+                # wrong one, because it uses updated value[] in current iteration, it should only use data from previous iteration
+                #self.values[state] = self.computeQValueFromValues(state, self.computeActionFromValues(state))
+                vmax = float("-inf")
+                for action in self.mdp.getPossibleActions(state):
+                    Q = 0
+                    for nextState, prob in self.mdp.getTransitionStatesAndProbs(state, action):
+                        Q += prob * (self.mdp.getReward(state, action, nextState) + (self.discount * self.values[nextState]))
+                    vmax = max(vmax, Q)
+                    temps[state] = vmax
+            self.values = temps
 
     def getValue(self, state):
         """
